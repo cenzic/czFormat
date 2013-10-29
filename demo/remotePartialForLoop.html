@@ -1,0 +1,93 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Remote for loop partial render</title>
+<script src="../js/jquery-1.9.1.js"></script>
+<script src="../js/jFormat.js"></script>
+<style>
+	.scrollTable{
+		border: black 1px solid;
+		overflow: auto;
+		height:400px;
+		width: 800px;
+		text-align: center;
+	}
+	.scrollTable table{
+		border-collapse: collapse;
+		width: 95%;
+		margin: auto;
+	}
+	.scrollTable table td, .scrollTable table th{
+		border: black 1px solid;
+	}
+</style>
+</head>
+<body>
+	<h1>Remote for loop partial render</h1>
+    <script id="complexPartial" type="text/template">
+    <h2>Complex Partial: render partial template in for loop</h2>
+    <p>
+        <strong>Class: </strong>@model.class
+    </p>
+    <p>
+        <strong>Professor: </strong>@model.professor
+    </p>
+    <table>
+        <tr>
+            <th>Order</th>
+            <th>Name</th>
+            <th>Score</th>
+            <th>DOB</th>
+        </tr>
+        @for(var student in model.students){
+        <tr>
+            $.jFormat("@partialRow", @student)
+        <tr>
+        }
+    </table>
+    <p>
+        <strong>note:</strong>@model.note
+    </p>
+    <p>
+        <strong>render: </strong><span id="complexPartialRunTime" />
+    </p>
+</script>
+    <div id="complexPartialWrapper1" class="scrollTable"></div>
+    <div id="complexPartialWrapper2" class="scrollTable"></div>
+	<script>		
+        var records = {};
+        var arr = [];
+        var startDate = new Date(1970,01,01);
+        var endDate = new Date();
+        var diff = endDate - startDate;
+        for(var i=0; i<3; i++){
+            var name = Math.random().toString(36).substring(2);
+            var score = Math.floor(Math.random()*1001);
+            var dob = new Date(startDate.setTime(Math.random()*diff));
+            var r = {order:i+1,name:name,score:score,dob:dob};
+            records[name] = r;
+            arr.push(r);
+        }        
+        var model1 = {
+            "class":"Huge class",
+            "professor":"It's me",
+            "students":records,
+            "note":"test complex model with array and simple property"
+        }
+        var model2 = {
+                "class":"Huge class",
+                "professor":"It's me",
+                "students":records,
+                "note":"test complex model with array and simple property"
+            }
+        //===========================================================
+        $.jFormat.init({
+            baseUrl: "http://localhost/github/jFormat/views"            
+        });
+        $("#complexPartialWrapper1").jFormat("#complexPartial", model1);
+        $("#complexPartialWrapper2").jFormat("#complexPartial", model2);
+	</script>
+		
+</body>
+</html>

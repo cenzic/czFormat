@@ -1,0 +1,17 @@
+<h2>Array model</h2>
+<table>
+	<tr>
+		<th>Order</th>
+		<th>Name</th>
+		<th>Score</th>
+		<th>DOB</th>
+	</tr>
+	@for(var record in model){
+		<tr>
+			<td>@record.order</td>
+			<td>@record.name</td>
+			<td>@record.score</td>
+			<td>@record.dob</td>
+		</tr>
+	}
+</table>

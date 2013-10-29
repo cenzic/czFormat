@@ -1,0 +1,29 @@
+<h2>Complex model: mix of simple property and array</h2>
+<p>
+	<strong>Class: </strong>@model.class		
+</p>
+<p>
+	<strong>Professor: </strong>@model.professor
+</p>
+<table>
+	<tr>
+		<th>Order</th>
+		<th>Name</th>
+		<th>Score</th>
+		<th>DOB</th>
+	</tr>
+	@for(var student in model.students){
+		<tr>
+			<td>@student.order</td>
+			<td>@student.name</td>
+			<td>@student.score</td>
+			<td>@student.dob</td>
+		<tr>
+	}
+</table>
+<p>
+	<strong>note:</strong>@model.note
+</p>
+<p>
+	<strong>render: </strong><span id="complexRunTime"/>
+</p>

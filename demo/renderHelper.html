@@ -1,0 +1,88 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>render helper</title>
+<script src="../js/jquery-1.9.1.js"></script>
+<script src="../js/jFormat.js"></script>
+</head>
+<body>
+	<h1>render helper</h1>
+<script id="simpleTemplate" type="text/template">
+<p>
+	<strong>'title': </strong>@model.title
+</p>
+<p>
+	<strong>name: </strong>@upper(model.name)
+</p>
+<p>
+	<strong>age: </strong>@raw(model.age)
+</p>
+<p>
+	<strong>dob: </strong>@dob(model.dob)
+</p>
+<p>
+	<strong>arbitrary function:</strong>
+	@noProperty("some string", 123, 12.32, true, false, null)
+</p>
+<p>
+	<strong>replace attribute</strong>
+	<span a="something" b="@someAttribute('test',123)" id="attrFunc">value should be change</span>
+</p>
+<p>
+	<strong>replace form</strong>
+	<!-- form id="customForm" action="@hashPath('simpleModel')" method="post" onsubmit="$.jf.formSubmitHandler(event);"  someAtrr="other" -->
+	<form id="customForm" action="@hashPath('simpleModel')" method="post" onsubmit="$.jf.formSubmitHandler(event);"  someAtrr="other)">		
+	</form>
+	
+</p>
+</script>
+	<div id="simpleWrapper"></div>
+	
+	<div id="simpleWrapperDirect"></div>
+	
+	<script>		
+	
+        var model = {
+            "title": "test <title>",
+            "name": "test 'name'",
+            "age": "<i>unescapeme</i>",
+            "dob": new Date()
+        }
+        $.jFormat.addHelper({
+        	upper:function(str){
+        		return str.toUpperCase();
+        	},
+        	dob: function(d){
+        		//console.log("debug:%s",d);
+        		return (d.getMonth()+1) + "/" + d.getDate() + "/" + d.getFullYear();
+        	},
+        	noProperty: function(text, intNum, floatNum, trueValue, falseValue, nullValue, undefinedValue){
+        		return "text: " + text + "<br/>" +
+        		"intNum + 10: " + (intNum + 10) + "<br/>" +
+        		"floatNum + 2: " + (floatNum + 2) +"<br/>" +
+        		"trueValue===true ? correct : incorrect | " + (trueValue === true ? "correct" : "incorrect") +"<br/>" +
+        		"flaseValue===false ? correct : incorrect | " + (falseValue === false ? "correct" : "incorrect") +"<br/>" +
+        		"nullValue===null ? correct : incorrect | " + (nullValue === null ? "correct" : "incorrect") +"<br/>" +
+        		"undefinedValue===undefined ? correct : incorrect | " + (undefinedValue === undefined ? "correct" : "incorrect")
+        	},
+        	someAttribute: function(text,num){
+        		return text + " = " + num;
+        	},
+        	hashPath: function(name){
+        		return name + "/" + "something";
+        	}
+        });
+        $("#simpleWrapper").jFormat("#simpleTemplate",model,function(){
+        	var text = $("#attrFunc").get(0).outerHTML;
+        	text = $("<div/>").text(text).html();
+        	console.log("get here: %s",text);        	        	
+        	$("#attrFunc").html(text);
+        	var text = $("#customForm").get(0).outerHTML;
+        	text = $("<div/>").text(text).html();
+        	$("#customForm").html(text);
+        });
+        //$("#simpleWrapperDirect").html($.jFormat("#simpleTemplate",model));
+	</script>		
+</body>
+</html>

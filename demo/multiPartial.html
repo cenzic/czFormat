@@ -1,0 +1,50 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>format block of code with jquery</title>
+<script src="../js/jquery-1.9.1.js"></script>
+<script src="../js/jFormat.js"></script>
+</head>
+<body>
+	<h1>Format block of code with jquery similar to backbone render</h1>
+<script id="testme" type="text/template">
+<h2>simple model</h2>
+<p>
+	<strong>'title': </strong>@model.title
+</p>
+<p>
+	<strong>name: </strong>@model.name
+</p>
+<p>
+	<strong>age: </strong>@raw(model.age)
+</p>
+<p>
+	<strong>not defined property: @model.notdefined</strong>
+</p>		
+<p>		
+	<u>Render time for 100 time:</u><strong id='jFormat100'></strong>
+</p>		
+</script>
+<script id="multiPartial" type="text/template">
+<div>
+	$.jFormat("#testme",@model)
+</div>
+<div>
+	$.jFormat("#testme",@model)
+</div>
+</script>
+<div id="wrapperTestMe"></div>
+	
+
+<script>		       
+       var model = {
+           "title": "test <title>",
+           "name": "test 'name'",
+           "age": "<i>unescapeme</i>"
+       }
+       $("#wrapperTestMe").jFormat("#multiPartial",model);
+</script>
+		
+</body>
+</html>

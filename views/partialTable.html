@@ -1,0 +1,14 @@
+<h2>Partial Table</h2>
+<table>
+	<tr>
+		<th>Order</th>
+		<th>Name</th>
+		<th>Score</th>
+		<th>DOB</th>
+	</tr>
+	@for(var record in model){
+		<tr>
+			$.jFormat("@partialRow", @record)
+		<tr>
+	}
+</table>

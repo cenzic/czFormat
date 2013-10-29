@@ -1,0 +1,126 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>format block of code with jquery</title>
+<script src="../js/jquery-1.9.1.js"></script>
+<script src="../js/jFormat.js"></script>
+<style>
+	.scrollTable{
+		border: black 1px solid;
+		overflow: auto;
+		height:400px;
+		width: 800px;
+		text-align: center;
+	}
+	.scrollTable table{
+		border-collapse: collapse;
+		width: 95%;
+		margin: auto;
+	}
+	.scrollTable table td, .scrollTable table th{
+		border: black 1px solid;
+	}
+</style>
+</head>
+<body>
+	<h1>Format block of code with jquery similar to backbone render</h1>	
+	<div id="wrapperTestMe"></div>
+	<div id="wrapperTable" class="scrollTable"></div>
+	<strong id="tableRunTime"></strong>
+	<div id="complexModelWrapper" class="scrollTable"></div>
+	<div id="partialRenderWrapper" class="scrollTable"></div>	
+	<div id="ifElseWrapper"></div>
+
+	<script type="text/javascript">		
+		$.jFormat.init({
+		    baseUrl: "http://localhost/github/jFormat/views",
+			paths:{
+				"ifelse":"ifelse.html",
+				"testme":"simple.html"
+			}
+		});
+		
+		//=============================== simple block ==============================
+		
+		var model1 = {
+			"title": "test <title>",
+			"name": "test 'name'",
+			"age": "<i>unescapeme</i>"
+		}				
+		
+		{
+			var start = new Date();			
+			for(var i=0; i<100; i++){
+				$("#wrapperTestMe").jFormat("@testme",model1,function(){
+					var end = new Date();		
+					$("#jFormat100").html(end-start + "ms");
+				});
+			}
+		};
+		
+		//=============================== if else block ===================================
+		
+		var model3 = {
+			condition1: true,
+			condition2: false,
+			condition3: false,
+			condition4: true,
+			condition5: false,
+			condition6: false
+		}
+		{
+			var start = new Date();
+			$("#ifElseWrapper").jFormat("@ifelse",model3,function(){
+				var end = new Date();
+				$("#ifelseRunTime").html(end-start + "ms");		
+			});			
+		};
+		
+		
+		
+		
+	//render array model
+		var records = [];
+		var startDate = new Date(1970,01,01);
+		var endDate = new Date();
+		var diff = endDate - startDate;
+		for(var i=0;i<1000;i++){
+			var name = Math.random().toString(36).substring(2);
+			var score = Math.floor(Math.random()*1001);
+			var dob = new Date(startDate.setTime(Math.random()*diff));
+			records.push({order:i+1,name:name,score:score,dob:dob});
+		}
+		{
+			var start = new Date();
+			$("#wrapperTable").jFormat("@table",records,function(){
+				var end = new Date();
+				$("#tableRunTime").html(end-start + "ms");	
+			});			
+		}
+	//render complex table;
+		var model2 = {
+				"class":"Huge class",
+				"professor":"It's me",
+				"students":records,
+				"note":"test complex model with array and simple property"
+		}
+		{
+			var start = new Date();
+			$("#complexModelWrapper").jFormat("@complex",model2,function(){
+				var end = new Date();
+				$("#complexRunTime").html(end-start + "ms");	
+			});			
+		}
+		
+		{
+			var start = new Date();
+			$("#partialRenderWrapper").jFormat("@partial",model2,function(){
+				var end = new Date();
+				$("#partialRunTime").html(end-start + "ms");		
+			});			
+		}		
+	</script>
+		
+</body>
+</html>

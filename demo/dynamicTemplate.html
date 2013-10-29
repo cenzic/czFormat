@@ -1,0 +1,63 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>dynamic template</title>
+<script src="../js/jquery-1.9.1.js"></script>
+<script src="../js/jFormat.js"></script>
+</head>
+<body>
+	<h1>dynamic template</h1>
+	<script id="dynamicTemplate" type="text/template">
+<h2>main template</h2>
+<p>
+	<strong>'title': </strong>@model.title
+</p>
+<p>
+	<strong>@model.renderCount</strong>
+</p>
+<div>
+	$.jFormat("@model.template", @model.data)
+</div>
+	</script>
+	<div id="dynamicTemplateWrapper"></div>
+
+	<script>		
+	var records = [];
+    var startDate = new Date(1970,01,01);
+    var endDate = new Date();
+    var diff = endDate - startDate;
+    for(var i=0;i<10;i++){
+        var name = Math.random().toString(36).substring(2);
+        var score = Math.floor(Math.random()*1001);
+        var dob = new Date(startDate.setTime(Math.random()*diff));
+        records.push({order:i+1,name:name,score:score,dob:dob});
+    }  
+    
+	var model = {
+    	"title": "test title",
+    	//"template":"#table10Row",
+    	"template":"@table",
+        "data": records,
+        "renderCount": 1,
+    }
+	$.jFormat.init({baseUrl: "http://localhost/github/jFormat/views"});
+	
+	$("#dynamicTemplateWrapper").jFormat("#dynamicTemplate",model);
+	/*
+	model.renderCount++;
+	$("#dynamicTemplateWrapper").jFormat("#dynamicTemplate",model);
+	model.renderCount++;
+	$("#dynamicTemplateWrapper").jFormat("#dynamicTemplate",model);
+	
+	setTimeout(function(){
+		console.log("get here");
+		model.renderCount++;
+		model.template = "@table1";
+		$("#dynamicTemplateWrapper").jFormat("#dynamicTemplate",model);              		
+	},5000);
+	*/
+	</script>
+		
+</body>
+</html>
