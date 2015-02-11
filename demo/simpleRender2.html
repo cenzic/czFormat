@@ -1,0 +1,67 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>simple render template</title>
+<script src="../js/jquery-1.9.1.js"></script>
+<script src="../js/jFormat.js"></script>
+</head>
+<body>
+  <h1>simple render template</h1>
+<template id="simpleTemplate" type="text/template">
+<h2>simple model</h2>
+<p>
+  <strong>'title': </strong>@model[key].title
+</p>
+<p>
+  <strong>name: </strong>@model[key].name
+</p>
+<p>
+  <strong>age: </strong>@raw(model[key].age)
+</p>
+<p>
+  <strong>not defined property: @model[key].notdefined</strong>
+</p>
+<p>
+  <strong>array index</strong>: @model[key].arr[1]
+</p>
+<p>
+  <strong>multiple level property</strong>: @model[key].property.level2.level3
+</p>
+<p>
+  <strong>multiple level property index style</strong>: @model[key]["property with space"].level2[2]
+</p>
+<script>
+  var model2 = @@model[key];
+  var property = @model[key].property;
+  var property2 = @model[key]["property with space"];
+  console.log("model2: %s",JSON.stringify(model2));
+  console.log("property: %s",JSON.stringify(property));
+  console.log("property2: %s",JSON.stringify(property2));
+
+</script>
+</template>
+  <div id="simpleWrapper"></div>
+
+  <div id="simpleWrapperDirect"></div>
+
+  <script>
+        var model = {
+            "title": "test <title>",
+            "name": "test 'name'",
+            "age": "<i>unescapeme</i>",
+            arr: [1, 2, 3],
+            property:{
+              level2: {
+                level3: "level 3"
+              }
+            },
+            "property with space":{
+              level2: ["a", "b", "c"]
+            }
+        }
+        $("#simpleWrapper").jFormat("#simpleTemplate",model,"model[key]");
+        //$("#simpleWrapperDirect").html($.jFormat("#simpleTemplate",model));
+  </script>
+</body>
+</html>

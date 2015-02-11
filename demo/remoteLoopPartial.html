@@ -48,7 +48,7 @@
 		<th>Score</th>
 		<th>DOB</th>
 	</tr>
-	@for(var record in model.records){
+	@foreach(var record in model.records){
 		<tr>
 			$.jFormat("@partialRow",@record)
 		</tr>

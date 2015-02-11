@@ -1,0 +1,351 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>format block of code with jquery</title>
+<script src="../js/jquery-1.9.1.js"></script>
+<script src="../js/jFormat.js"></script>
+<style>
+	.scrollTable{
+		border: black 1px solid;
+		overflow: auto;
+		height:400px;
+		width: 800px;
+		text-align: center;
+	}
+	.scrollTable table{
+		border-collapse: collapse;
+		width: 95%;
+		margin: auto;
+	}
+	.scrollTable table td, .scrollTable table th{
+		border: black 1px solid;
+	}
+</style>
+</head>
+<body>
+	<h1>Format block of code with jquery similar to backbone render</h1>
+<script id="stringTemplate" type="text/template">
+	<h2>string model</h2>
+	<p>
+		<strong>@model</strong> is a string model
+	</p>
+	<p>
+		another use of string model <strong>@model</strong>
+	</p>
+</script>
+<div id="stringWrapper"></div>
+
+	<script id="testme" type="text/template">
+<h2>simple model</h2>
+<p>
+	<strong>'title': </strong>@model.title
+</p>
+<p>
+	<strong>name: </strong>@model.name
+</p>
+<p>
+	<strong>age: </strong>@raw(model.age)
+</p>
+<p>
+	<strong>not defined property: @model.notdefined</strong>
+</p>		
+<p>		
+	<u>Render time for 100 time:</u><strong id='jFormat100'></strong>
+</p>		
+	</script>
+	<div id="wrapperTestMe"></div>
+	
+	<div id="wrapperTable" class="scrollTable"></div>
+	<strong id="tableRunTime"></strong>
+    <script id="complexModel" type="text/template">
+	<h2>Complex model: mix of simple property and array</h2>
+	<p>
+		<strong>Class: </strong>@model.class		
+	</p>
+	<p>
+		<strong>Professor: </strong>@model.professor
+	</p>
+	<table>
+		<tr>
+			<th>Order</th>
+			<th>Name</th>
+			<th>Score</th>
+			<th>DOB</th>
+		</tr>
+		@foreach(var student in model.students){
+			<tr>
+				<td>@student.order</td>
+				<td>@student.name</td>
+				<td>@student.score</td>
+				<td>@student.dob</td>
+			<tr>
+		}
+	</table>
+	<p>
+		<strong>note:</strong>@model.note
+	</p>
+	<p>
+		<strong>render: </strong><span id="complexRunTime"/>
+	</p>
+</script>
+    <script id="table1000Row" type="text/template">
+		<h2>Array model</h2>
+		<table>
+			<tr>
+				<th>Order</th>
+				<th>Name</th>
+				<th>Score</th>
+				<th>DOB</th>
+			</tr>
+			@foreach(var record in model){
+				<tr>
+					<td>@record.order</td>
+					<td>@record.name</td>
+					<td>@record.score</td>
+					<td>@record.dob</td>
+				<tr>
+			}
+		</table>
+	</script><div id="complexModelWrapper" class="scrollTable"></div>
+
+    <script id="complexPartial" type="text/template">
+    <h2>Complex Partial: render partial template in for loop</h2>
+    <p>
+        <strong>Class: </strong>@model.class
+    </p>
+    <p>
+        <strong>Professor: </strong>@model.professor
+    </p>
+    <table>
+        <tr>
+            <th>Order</th>
+            <th>Name</th>
+            <th>Score</th>
+            <th>DOB</th>
+        </tr>
+        @foreach(var student in model.students){
+        <tr>
+            $.jFormat("@partialRow", @student)
+        <tr>
+        }
+    </table>
+    <p>
+        <strong>note:</strong>@model.note
+    </p>
+    <p>
+        <strong>render: </strong><span id="complexPartialRunTime" />
+    </p>
+</script>
+<script id="partialRow" type="text/template">
+    <td>@model.order</td>
+    <td>@model.name</td>
+    <td>@model.score</td>
+    <td>@model.dob</td>
+</script>        
+    <div id="complexPartialWrapper" class="scrollTable"></div>
+
+<script id="partialRender" type="text/template">
+	<h2>Complex model: mix of simple property and array</h2>
+	<p>
+		<strong>Class: </strong>@model.class		
+	</p>
+	<p>
+		<strong>Professor: </strong>@model.professor
+	</p>
+	$.jFormat("#table1000Row",@model.students)
+	<p>
+		<strong>note:</strong>@model.note
+	</p>
+	<p>
+		<strong>render: </strong><span id="partialRunTime"/>
+	</p>
+</script>
+	<div id="partialRenderWrapper" class="scrollTable"></div>	
+
+	<!-- If, else if, else statement -->
+<script id="ifelse" type="text/template">
+	<h2>If, else if, else statement</h2>
+	<p>
+	<h3>if only</h3>
+	@if(model.condition1){
+		<strong>Get if statement</strong>
+	}
+	</p>
+
+	<p>
+	<h3>show if condition</h3>
+	@if(model.condition1){
+		<strong>Get if statement</strong>
+	}
+	@else{
+		<strong>not show</strong>
+	}	
+	</p>
+
+	<p>
+	<h3>Show else condition</h3>
+	@if(model.condition2){
+		<strong>not show</strong>
+	}
+	@else{
+		<strong>get else statement</strong>
+	}
+	</p>
+
+	<p>
+	<h3>Show if else condition</h2>
+	@if(model.condition3){
+		<strong>not show</strong>
+	}
+	@else if(model.condition4){
+		<strong> get else if </strong>
+	}
+	@else{
+		<strong>not show</strong>
+	}
+	</p>
+	
+	<p>
+	<h3>show else condition in if else if<h4>
+	@if(model.condition5){
+		<strong>not show</strong>
+	}
+	@else if(model.condition6){
+		<strong> not show </strong>
+	}
+	@else if(model.condition7){
+		<strong> not show </strong>
+	}
+	@else if(model.condition8){
+		<strong> not show </strong>
+	}
+	@else{
+		<strong>get last else</strong>
+	}
+	</p>
+<strong>Run time: <span id="ifelseRunTime"/></strong>
+</script>
+
+<div id="ifElseWrapper"></div>
+
+<script id="switch" type="text/template">
+	<h2>Switch statement</h2>
+	<p>
+	@switch(model.type){
+		case "a": <strong>get A</strong>
+			break;
+		case "b": <strong>get B</strong>
+			<strong>get B</strong>
+		case "c":
+			<strong>get C</strong>
+			break;
+		case "d": <strong>get D</strong>
+			break;
+		default: <strong>get Default</strong>
+			<u>some thing else</u>	
+	}
+	</p>
+	<h3> That's it</h3>
+</script>
+
+<div id="switchWrapperA"></div>
+<div id="switchWrapperB"></div>
+<div id="switchWrapperC"></div>
+<div id="switchWrapperD"></div>
+<div id="switchWrapperF"></div>
+	<script>		
+/*	$("#switchWrapperA").html($.jFormat("#switch",{type:"a"}));
+	$("#switchWrapperB").html($.jFormat("#switch",{type:"b"}));
+	$("#switchWrapperC").html($.jFormat("#switch",{type:"c"}));
+	$("#switchWrapperD").html($.jFormat("#switch",{type:"d"}));
+	$("#switchWrapperE").html($.jFormat("#switch",{type:"e"}));*/
+        
+        var model1 = {
+            "title": "test <title>",
+            "name": "test 'name'",
+            "age": "<i>unescapeme</i>"
+        }
+
+        var records = [];
+        var startDate = new Date(1970,01,01);
+        var endDate = new Date();
+        var diff = endDate - startDate;
+        for(var i=0;i<1000;i++){
+            var name = Math.random().toString(36).substring(2);
+            var score = Math.floor(Math.random()*1001);
+            var dob = new Date(startDate.setTime(Math.random()*diff));
+            records.push({order:i+1,name:name,score:score,dob:dob});
+        }        
+        var model2 = {
+            "class":"Huge class",
+            "professor":"It's me",
+            "students":records,
+            "note":"test complex model with array and simple property"
+        }
+
+        //===========================================================
+        $.jFormat.init({
+            baseUrl: "http://localhost/github/jFormat/views"            
+        });
+        $("#complexPartialWrapper").jFormat("#complexPartial", model2);
+        
+        //render simple model
+        
+		$("#stringWrapper").jFormat("#stringTemplate","test something");
+						
+		
+		
+		start = new Date();
+		for(var i=0; i<1000; i++){
+			$("#wrapperTestMe").jFormat("#testme",model1);
+		}
+		end = new Date();		
+		$("#jFormat100").html(end-start + "ms");
+		
+		//====================== if else ==========================
+			
+		var model3 = {
+			condition1: true,
+			condition2: false,
+			condition3: false,
+			condition4: true,
+			condition5: false,
+			condition6: false
+		}
+		start = new Date();
+		$("#ifElseWrapper").jFormat("#ifelse",model3);
+		end = new Date();
+		$("#ifelseRunTime").html(end-start + "ms");
+			
+			
+		
+	//render array model
+		
+		start = new Date();
+		$("#wrapperTable").jFormat("#table1000Row",records);
+		end = new Date();
+		$("#tableRunTime").html(end-start + "ms");
+	//render complex table;
+		
+		start = new Date();
+		$("#complexModelWrapper").jFormat("#complexModel",model2);
+		end = new Date();
+		$("#complexRunTime").html(end-start + "ms");
+		start = new Date();
+		$("#partialRenderWrapper").jFormat("#partialRender",model2);
+		end = new Date();
+		$("#partialRunTime").html(end-start + "ms");
+		/* eval take a lot of time.
+		var a = 1;
+		start = new Date();
+		for(var i=0;i<1000;i++){
+			eval("if(a>1){a--}else{a++}");			
+		}
+		end = new Date();
+		console.log("run time: %d",end-start + "ms");
+		*/
+	</script>
+		
+</body>
+</html>

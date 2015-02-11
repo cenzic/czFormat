@@ -25,18 +25,20 @@
 </head>
 <body>
   <h1>For loop with hash and array</h1>
-  <template id="tmp">
-
-  </template>
   <script id="table1000Row" type="text/template">
     <h2>Array model</h2>
     <table>
-      @foreach(var item in model){
+      <tr>
+        <th>Name</th>
+        <th>Score</th>
+        <th>DOB</th>
+      </tr>
+      @foreach(var record in model){
         <tr>
-          @for(var key in item){
-            <td><strong>@key</strong>@item[key]</td>
-          }
-        </tr>
+          <td>@record.name</td>
+          <td>@record.score</td>
+          <td>@record.dob</td>
+        <tr>
       }
     </table>
   </script>
@@ -57,9 +59,9 @@
       records[name] = r;
       arr.push(r);
     }
-    console.log("model:%s", JSON.stringify(arr[0]));
-    $("#wrapperTable").jFormat("#table1000Row",arr[0]);
-    $("#wrapperTableDirect").jFormat("#table1000Row",arr[0]);
+
+    $("#wrapperTable").jFormat("#table1000Row",records);
+    $("#wrapperTableDirect").jFormat("#table1000Row",arr);
   </script>
 </body>
 </html>

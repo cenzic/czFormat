@@ -40,7 +40,7 @@
             <th>Score</th>
             <th>DOB</th>
         </tr>
-        @for(var student in model.students){
+        @foreach(var student in model.students){
         <tr>
             $.jFormat("#partialRow", @student)
         <tr>

@@ -25,18 +25,16 @@
 </head>
 <body>
   <h1>For loop with hash and array</h1>
-  <template id="tmp">
-
-  </template>
   <script id="table1000Row" type="text/template">
     <h2>Array model</h2>
     <table>
+      <tr>
+        <th>Name</th>
+      </tr>
       @foreach(var item in model){
         <tr>
-          @for(var key in item){
-            <td><strong>@key</strong>@item[key]</td>
-          }
-        </tr>
+          <td>@item</td>
+        <tr>
       }
     </table>
   </script>
@@ -50,16 +48,12 @@
     var endDate = new Date();
     var diff = endDate - startDate;
     for(var i=0;i<3;i++){
-      var name = Math.random().toString(36).substring(2);
-      var score = Math.floor(Math.random()*1001);
-      var dob = new Date(startDate.setTime(Math.random()*diff));
-      var r = {name:name,score:score,dob:dob};
-      records[name] = r;
-      arr.push(r);
+      var name = "some name" + Math.random().toString(36).substring(2);
+      arr.push(name);
     }
-    console.log("model:%s", JSON.stringify(arr[0]));
-    $("#wrapperTable").jFormat("#table1000Row",arr[0]);
-    $("#wrapperTableDirect").jFormat("#table1000Row",arr[0]);
+
+    $("#wrapperTable").jFormat("#table1000Row",arr);
+    $("#wrapperTableDirect").jFormat("#table1000Row",arr);
   </script>
 </body>
 </html>
