@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <title>Regex test</title>
+  <script src="../js/jquery-1.9.1.js"></script>
+ </head>
+ <body>
+  <h1>Test nested structure for format</h1>
+  <div id="transform2Wrapper"></div>
+<template id="test1">
+  <h2>nested foreach loop</h2>
+  <table>
+  @foreach(var row in model){
+    <tr>
+      @foreach(var cell in row){
+        <td>@cell</td>
+      }
+    </tr>
+  }
+  </table>
+</template>
+<template id="test2">
+  <h2>nested foreach loop</h2>
+  <table>
+  @foreach(var row in model.rows){
+    <tr>
+      @foreach(var cell in row){
+        <td class="@cell.class">@cell.text</td>
+      }
+    </tr>
+  }
+  </table>
+</template>
+<template id="test2">
+  <h2>nested foreach loop</h2>
+  <table>
+  @foreach(var row in model.rows){
+    <tr>
+      @foreach(var cell in row.items){
+        @if(row.type=="aaa"){
+          <td class="hidden">@cell.text</td>
+        }
+        @else{
+          <td class="block">@cell.text</td>
+        }
+      }
+    </tr>
+  }
+  </table>
+</template>
+<script type="template" id="transform">
+  <tr>
+  @foreach(var i in model){
+    <td>@i</td>
+  }
+  </tr>
+</script>
+<script type="template" id="transform1">
+  <tr>
+  @for(var i in model){
+    <td>@model[i]</td>
+  }
+  </tr>
+</script>
+
+<script type="template" id="transform2">
+  <table>
+  @for(var row in model){
+    <tr>
+    @for(var col in model[row]){
+      <td>@model[row][col]</td>
+    }
+    </tr>
+  }
+  </table>
+</script>
+<script>
+//var regex = /@foreach\(var (\w+) in model\){/;
+//var  out = text.replace(regex,"@for(var t in model){var i = model[t];");
+  var model = ["a","b","c"];
+  function evalTemplate(template, model){
+    var text = $(template).html();
+    var out = text.replace(/[\t\n\r]/g,"");
+    out = "(function(){window.output = '"+out;
+    var r = "@(for\\(var \\w+ in model\\)\\{)";
+    regex = new RegExp(r);
+    out = out.replace(regex,"'+(function(){ var tmp = ''; $1 tmp += '");
+    out = out.replace(/@model\[(\w+)\]/,"'+model[$1]+'");
+    out = out.replace("}","'}; return tmp;})()+'");
+    out += "'})();";
+    window.output = '';
+    //console.log(out);
+    eval(out);
+    //console.log(output);
+  }
+
+  function replaceTemplate(template, model){
+    //console.log(template);
+    var text = $(template).html();
+    //console.log(text);
+    var regex = new RegExp("@for\\(var (.+) in model\\)\\{([\\s\\S]*?)\\}", "g");
+    text = text.replace(regex,function(match, item, body){
+      var out = "";
+      for(var i in model){
+        var val = model[i];
+        var regex1 = new RegExp("@model\\[" + item +"\\]","g");
+        out += body.replace(regex1, val);
+      }
+      return out;
+    });
+    return text;
+  }
+
+  /*
+  var formatted = replaceTemplate();
+  console.log(formatted);
+  */
+
+  function timer(callback){
+    var start = new Date();
+    callback();
+    var end = new Date();
+    var runTime = end-start;
+    console.log("run time: %d", runTime);
+    return runTime;
+  }
+
+  function multi(count, callback){
+    return function(){
+      for(var i=0;i<count;i++){
+        callback();
+      }
+    }
+  }
+
+  timer(multi(1000, function(){evalTemplate("#transform1",model)}));
+  timer(multi(1000, function(){
+      replaceTemplate('#transform1',model);
+    }));
+
+var t2 = $("#transform2").html();
+/**
+ * return the collection of function body
+ */
+function split(text){
+  var fReg = /@(for|foreach).+\{\n/g
+  var m = text.match(fReg);
+  if(!m) return;
+  var out = [];
+  var lastEnd;
+  var lastBody = "";
+  var lastId = "";
+  for(var i=m.length-1;i>=0;i--){
+    var startIndex = text.indexOf(m[i]);
+    var endIndex = text.indexOf("}", (lastEnd || startIndex)+1);
+    var body = text.substring(startIndex, endIndex+2);
+    var id = Math.random().toString(36).slice(2);
+    var tmp = body;
+    var match = m[i].match(/var (.+) in/);
+    var key = match[1];
+    body = body.slice(m[i].length,-2);
+    if(lastBody) body = body.replace(lastBody,lastId);
+    lastBody = tmp;
+    lastId = id;
+    lastEnd = endIndex;
+    out.push({body:body,org: tmp, key: key, id: id});
+  }
+  return out;
+}
+  var nestedInfo = split(t2);
+  var table = [];
+  for(var row = 0; row < 100; row++){
+    table[row] = [];
+    for(var col = 0; col < 5; col++){
+      table[row][col] = Math.random().toString(36).slice(2);
+    }
+  }
+
+  function replaceT2(){
+    var info = split(t2);
+    var nestedText = nestedForLoop(info,table);
+    var formatted = t2.replace(info.pop().org, nestedText);
+    $("#transform2Wrapper").html(formatted);
+  }
+
+  function nestedForLoop(nestedInfo,model){
+   var out = "";
+   for(var i in model){
+    var outside = "";
+    for(var j in model[i]){
+      var inside = nestedInfo[0].body.replace("@model["+nestedInfo[1].key+"]["+nestedInfo[0].key+"]",model[i][j]);
+      outside += inside;
+    }
+    out += nestedInfo[1].body.replace(nestedInfo[0].id, outside);
+   }
+   return out;
+  }
+  timer(multi(100,replaceT2));
+
+  function _evalT2(){
+    var out = "<table>";
+  for(var row in table){
+    out += "<tr>";
+    for(var col in table[row]){
+      out += "<td>" + table[row][col] + "</td>";
+    }
+    out += "</tr>";
+  }
+  out += "</table>";
+    return out;
+  }
+  function evalT2(){
+    var out;
+    var func = _evalT2.toString();
+    func += ";out = _evalT2();";
+    eval(func);
+    $("#transform2Wrapper").html(out);
+  }
+  timer(multi(100,evalT2));
+</script>
+ </body>
+</html>
