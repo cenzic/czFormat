@@ -1,36 +1,74 @@
 /**
- * Copyright © Quoc Quach 2013-2014 Author: Quoc Quach Email:
- * quoc_cooc@yahoo.com Released under the MIT license Date: 09/07/2014
+ * Copyright © Quoc Quach 2013-2015
+ * Author: Quoc Quach
+ * Email: quoc_cooc@yahoo.com
+ * Released under the MIT license
+ * Date: 03/06/2015
  */
 (function($) {
-  $.fn.jFormat = function(id, model) {
-    var name, callback;
-    if(arguments.length==2){
-      name="model";
-      callback=null;
-    }
-    else if(arguments.length==3){
-      if(typeof(arguments[2])=="function"){
-        name="model";
-        callback=arguments[2];
-      }else{
-        name=arguments[2];
-        callback=null;
-      }
-    }
-    else{
-      name=arguments[2];
-      callback=arguments[3];
-    }
+  $.fn.jFormat = function(id, model, callback) {
     var self = this;
-    $.jFormat(id, model, name, function(formattedText) {
-      // console.log("replaced formatted text for Id: %s", id);
-      // console.log("formattedText: %s",formattedText);
+    $.jFormat(id, model, function(formattedText) {
       self.html(formattedText);
       if (callback)
         callback.call(self, formattedText);
     });
   };
+
+  $.fn.jFormat2 = function(id, model, callback) {
+    var self = this;
+    $.jFormat2(id, model, function(formattedText) {
+      self.html(formattedText);
+      if (callback)
+        callback.call(self, formattedText);
+    });
+  };
+
+  function replace(t){
+    t = t.replace(/\\/,'\\\\');
+    t = t.replace(/@model((\.[^\s<;]+)*(\[".+?"\])*(\.[^\s<;]+)*)+/g,function(m0){return m0.replace(/"/g,"'")});
+    t = t.replace(/"/g,'\\"');
+    t = t.replace(/@{2}/g,"{##}");
+    t = replaceHelper(t);
+    t = t.replace(/@model((\.[^\s<;]+)*(\['.+?'\])*(\.[^\s<;]+)*)+/g,function(m0){return '" + helpers.htmlEscape(' + m0.substr(1) + ') + "'});
+    t = t.replace(/@([^\s<;]+)/g,function(m0, m1){return '" + ' + m1 + ' + "'});
+    t = t.replace(/\{##\}/g,"");
+    t = t.replace(/\n/g,'"+\n"');
+    t = '"' + t + '"';
+    return t;
+  }
+
+  function replaceHelper(t){
+    for(var i in helpers){
+      var regex = new RegExp("@"+i,"g");
+      t = t.replace(regex,"@helpers."+i );
+    }
+    return t;
+  }
+
+  var helpers = {
+      raw : function(s) {
+        return s;
+      },
+      htmlEscape: htmlEscape
+    };
+
+  function jEval(func){
+    func = "out = " + func + ";";
+    var out;
+    eval(func);
+    return out;
+  }
+
+  $.jFormat2 = function(id, model, callback){
+    var t = $(id).html();
+    t = replace(t);
+    var formatted = jEval(t);
+    if(callback){
+      callback.call(this,formatted);
+    }
+    return formatted;
+  }
 
   $.jFormat = function(id, model) {
     var name, callback;
@@ -84,17 +122,12 @@
     }
   };
 
-  var helpers = {
-    raw : function(s) {
-      return s;
-    }
-  };
+
   $.jFormat.addHelper = function(h) {
     helpers = $.extend(helpers, h);
   }
 
-  // ========================== Private functions
-  // ================================
+  // ========================== Private functions ================================
   function getTemplate(id, callback) {
     var template;
     if (callback) {
@@ -131,10 +164,12 @@
     }
     return template;
   }
+
   function getFullUrl(path) {
     path = jFormatOptions.paths[path] || (path + ".html");
     return jFormatOptions.baseUrl + "/" + path;
   }
+
   function getTemplateSync(url) {
     if (jFormatCache[url] !== undefined) {
       return jFormatCache[url].data;
@@ -155,6 +190,7 @@
     });
     return template;
   }
+
   function getTemplateAsync(url, callback) {
     if (jFormatCache[url] !== undefined) {
       var cache = jFormatCache[url];
@@ -190,13 +226,21 @@
   }
 
   function htmlEscape(str) {
-    return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(
-        /'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
   }
 
   function htmlUnescape(value) {
-    return String(value).replace(/&quot;/g, '"').replace(/&#39;/g, "'")
-        .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
+    return String(value)
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&');
   }
 
   function getObjectProperty(obj, propertyStr) {
@@ -215,6 +259,7 @@
     }
     return current;
   }
+
   /**
    * This is good if property used multiple time, but it bad if there are many
    * properties not being used. cannot handle non-defined properties.

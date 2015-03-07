@@ -7,61 +7,62 @@
 <script src="../js/jFormat.js"></script>
 </head>
 <body>
-	<h1>simple render template</h1>
+  <h1>simple render template</h1>
 <template id="simpleTemplate" type="text/template">
 <h2>simple model</h2>
 <p>
-	<strong>'title': </strong>@model.title
+  <strong>'title': </strong>@model.title
 </p>
 <p>
-	<strong>name: </strong>@model.name
+  <strong>name: </strong>@model.name
 </p>
 <p>
-	<strong>age: </strong>@raw(model.age)
+  <strong>age: </strong>@raw(model.age)
 </p>
 <p>
-	<strong>not defined property: @model.notdefined</strong>
-</p>	
-<p>
-	<strong>array index</strong>: @model.arr[1]
-</p>	
-<p>
-	<strong>multiple level property</strong>: @model.property.level2.level3
+  <strong>not defined property: @model.notdefined</strong>
 </p>
 <p>
-	<strong>multiple level property index style</strong>: @model["property with space"].level2[2]
+  <strong>array index</strong>: @model.arr[1]
+</p>
+<p>
+  <strong>multiple level property</strong>: @model.property.level2.level3
+</p>
+<p>
+  <strong>multiple level property index style</strong>: @model["property with space"].level2[2]
 </p>
 <script>
-	var model2 = @@model;	
-	var property = @model.property;
-	var property2 = @model["property with space"];
-	console.log("model2: %s",JSON.stringify(model2));
-	console.log("property: %s",JSON.stringify(property));
-	console.log("property2: %s",JSON.stringify(property2));
-	
+  var model2 = model;
+  var property = model.property;
+  var property2 = model["property with space"];
+  console.log("model2: %s",JSON.stringify(model2));
+  console.log("property: %s",JSON.stringify(property));
+  console.log("property2: %s",JSON.stringify(property2));
+
 </script>
 </template>
-	<div id="simpleWrapper"></div>
-	
-	<div id="simpleWrapperDirect"></div>
-	
-	<script>		
+  <div id="simpleWrapper"></div>
+
+  <div id="simpleWrapperDirect"></div>
+
+  <script>
         var model = {
             "title": "test <title>",
             "name": "test 'name'",
             "age": "<i>unescapeme</i>",
             arr: [1, 2, 3],
             property:{
-            	level2: {
-            		level3: "level 3"
-            	}
+              level2: {
+                level3: "level 3"
+              }
             },
             "property with space":{
-            	level2: ["a", "b", "c"]
+              level2: ["a", "b", "c"]
             }
-        }        
-        $("#simpleWrapper").jFormat("#simpleTemplate",model);
-        $("#simpleWrapperDirect").html($.jFormat("#simpleTemplate",model));        
-	</script>		
+        }
+        $("#simpleWrapper").jFormat2("#simpleTemplate",model);
+
+        $("#simpleWrapperDirect").html($.jFormat2("#simpleTemplate",model));
+  </script>
 </body>
 </html>
