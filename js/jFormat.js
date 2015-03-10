@@ -26,12 +26,18 @@
 
   function replace(t){
     t = t.replace(/\\/,'\\\\');
-    t = t.replace(/@model((\.[^\s<;]+)*(\[".+?"\])*(\.[^\s<;]+)*)+/g,function(m0){return m0.replace(/"/g,"'")});
+    t = t.replace(/@model((\.[\w.\(\)]+)*(\[".+?"\])*(\.[\w.\(\)]+)*)+/g,function(m0){return m0.replace(/"/g,"'")});
     t = t.replace(/"/g,'\\"');
     t = t.replace(/@{2}/g,"{##}");
     t = replaceHelper(t);
-    t = t.replace(/@model((\.[^\s<;]+)*(\['.+?'\])*(\.[^\s<;]+)*)+/g,function(m0){return '" + helpers.htmlEscape(' + m0.substr(1) + ') + "'});
-    t = t.replace(/@([^\s<;]+)/g,function(m0, m1){return '" + ' + m1 + ' + "'});
+    t = replaceIf(t);
+    //t = replaceElseif(t);
+    //t = replaceElse(t);
+    t = replaceForeach(t);
+    t = replaceForloop(t);
+    //t = t.replace(/\}/g,'"; } return tmp;})() + "');
+    t = t.replace(/@model((\.[\w.\(\)]+)*(\['?.+?'?\])*(\.[\w.\(\)]+)*)+/g,function(m0){return '" + helpers.htmlEscape(' + m0.substr(1) + ') + "'});
+    t = t.replace(/@([\w.\(\)]+)/g,function(m0, m1){return '" + ' + m1 + ' + "'});
     t = t.replace(/\{##\}/g,"");
     t = t.replace(/\n/g,'"+\n"');
     t = '"' + t + '"';
@@ -46,6 +52,111 @@
     return t;
   }
 
+  function replaceForeach(t){
+    var out = t.replace(/@foreach\(var (.+) in ([^\)]*)\)\{\n/g, function(m0, m1, m2){
+      var t = '" + (function(){' +
+      'var tmp = "";' +
+      'for(var i in ' + m2 + '){' +
+      'var ' + m1 + ' = ' + m2 + '[i];' +
+      'tmp += "';
+      return t;
+    });
+    var startIndex = t.indexOf("@foreach");
+    return closeStatement(out, startIndex);
+  }
+
+  function replaceForloop(t){
+    var out = t.replace(/@(for\([^\)]+\)\{)\n/g, function(m0, m1){
+      var t = '" + (function(){' +
+      'var tmp = "";' +  m1 +
+      'tmp += "';
+      return t;
+    });
+    var startIndex = t.indexOf("@for");
+    return closeStatement(out, startIndex);
+  }
+
+  function replaceIf(t){
+    var r = /@(if\([^\)]+\)\{)\n/g;
+    var m;
+    while(m = r.exec(t)){
+      var startIndex = t.indexOf(m[0]);
+      console.log("replaceIf | m: %s", m[0]);
+      var out = '" + (function(){' +
+      'var tmp = "";' +  m[1].replace(/\\"/g,"'") +
+      'tmp += "';
+      t = t.replace(m[0], out);
+      t = closeStatement(t, startIndex);
+    }
+    return t;
+  }
+
+  function replaceElseif(t){
+    var r = /@(else if\([^\)]+\)\{)\n/;
+    var m = r.exec(t);
+    var startIndex = t.indexOf(m[0]);
+    t = t.replace(m[0], m[1].replace(/\\"/g,"'") + " tmp += \"");
+    t = closeStatement(t, startIndex);
+    return t;
+  }
+
+  function replaceElse(t){
+    var r = /@else\{\n/;
+    var m = r.exec(t)
+    var startIndex = t.indexOf(m[0]);
+    t = t.replace(m[0],"else{ tmp += \"");
+    t = closeStatement(t, startIndex, true);
+    return t;
+  }
+
+  //    t = t.replace(/\}/g,'"; } return tmp;})() + "');
+  function closeStatement(t, startIndex, closed){
+    console.log("closeStatement");
+    var closeIndex = t.indexOf("}",startIndex);
+    var forIndex = t.indexOf("@for", startIndex);
+    forIndex = forIndex!=-1 ? forIndex : Number.MAX_VALUE;
+    if(closeIndex > forIndex){
+      replaceForloop(t);
+      return closeStatement(t, closeIndex, closed);
+    }
+    var foreachIndex = t.indexOf("@foreach", startIndex);
+    foreachIndex = foreachIndex!=-1 ? foreachIndex : Number.MAX_VALUE;
+    if(closeIndex > forIndex){
+      replaceForeach(t);
+      return closeStatement(t, closeIndex, closed);
+    }
+
+    if(closed){
+      console.log("closed block");
+      return t.replace("}\n",'"; } return tmp;})() + "');
+    }
+    var elseifIndex = t.indexOf("@else if", startIndex);
+    if(elseifIndex!=-1){
+      var tmp = t.substring(closeIndex+1,elseifIndex);
+      if(!tmp.match(/\S/g,'')){
+        console.log("calling replace else if");
+        t = t.replace("}\n","\";}");
+        t = replaceElseif(t);
+        return t;
+      }
+    }
+
+    var elseIndex = t.indexOf("@else{\n", startIndex);
+    if(elseIndex!=-1){
+      var tmp = t.substring(closeIndex+1,elseIndex);
+      if(!tmp.match(/\S/g,'')){
+        console.log("calling replace else");
+        t = t.replace("}\n","\";}");
+        t = replaceElse(t);
+        return t;
+      }
+    }
+
+    return t.replace("}\n",'"; } return tmp;})() + "');
+  }
+
+
+
   var helpers = {
       raw : function(s) {
         return s;
@@ -53,8 +164,9 @@
       htmlEscape: htmlEscape
     };
 
-  function jEval(func){
+  function jEval(model, func){
     func = "out = " + func + ";";
+    console.log(func);
     var out;
     eval(func);
     return out;
@@ -63,7 +175,7 @@
   $.jFormat2 = function(id, model, callback){
     var t = $(id).html();
     t = replace(t);
-    var formatted = jEval(t);
+    var formatted = jEval(model, t);
     if(callback){
       callback.call(this,formatted);
     }

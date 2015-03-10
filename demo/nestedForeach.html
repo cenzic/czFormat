@@ -24,7 +24,7 @@
 </style>
 </head>
 <body>
-  <h1>For loop with hash and array</h1>
+  <h1>Nested foreach</h1>
   <script id="table1000Row" type="text/template">
     <h2>Array model</h2>
     <table>
@@ -33,12 +33,12 @@
         <th>Score</th>
         <th>DOB</th>
       </tr>
-      @foreach(var record in model){
+       @foreach(var row in model){
         <tr>
-          <td>@record.name</td>
-          <td>@record.score</td>
-          <td>@record.dob</td>
-        <tr>
+          @foreach(var col in row){
+            <td>@col</td>
+          }
+        </tr>
       }
     </table>
   </script>
@@ -60,8 +60,8 @@
       arr.push(r);
     }
 
-    $("#wrapperTable").jFormat("#table1000Row",records);
-    $("#wrapperTableDirect").jFormat("#table1000Row",arr);
+    $("#wrapperTable").jFormat2("#table1000Row",records);
+    $("#wrapperTableDirect").jFormat2("#table1000Row",arr);
   </script>
 </body>
 </html>

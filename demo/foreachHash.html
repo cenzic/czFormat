@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>For loop with array</title>
+<title>For loop with hash</title>
 <script src="../js/jquery-1.9.1.js"></script>
 <script src="../js/jFormat.js"></script>
 <script src="../js/jUtil.js"></script>
@@ -25,19 +25,17 @@
 </style>
 </head>
 <body>
-  <h1>For loop with array</h1>
+  <h1>For loop with hash and array</h1>
   <script id="table1000Row" type="text/template">
     <h2>Array model</h2>
     <table>
       <tr>
-        <th>Order</th>
         <th>Name</th>
         <th>Score</th>
         <th>DOB</th>
       </tr>
       @foreach(var record in model){
         <tr>
-          <td>@record.order</td>
           <td>@record.name</td>
           <td>@record.score</td>
           <td>@record.dob</td>
@@ -45,23 +43,29 @@
       }
     </table>
   </script>
-  <div id="wrapperTable" class="scrollTable"></div>
-  <script>
-        var records = [];
-        var startDate = new Date(1970,01,01);
-        var endDate = new Date();
-        var diff = endDate - startDate;
-        for(var i=0;i<10;i++){
-            var name = Math.random().toString(36).substring(2);
-            var score = Math.floor(Math.random()*1001);
-            var dob = new Date(startDate.setTime(Math.random()*diff));
-            records.push({order:i+1,name:name,score:score,dob:dob});
-        }
-
-        //===========================================================
+    <div id="wrapperTable" class="scrollTable"></div>
+    <div id="wrapperTableDirect" class="scrollTable"></div>
+    <script>
+  //render array model
+    var records = {};
+    var arr = [];
+    var startDate = new Date(1970,01,01);
+    var endDate = new Date();
+    var diff = endDate - startDate;
+    for(var i=0;i<100;i++){
+      var name = Math.random().toString(36).substring(2);
+      var score = Math.floor(Math.random()*1001);
+      var dob = new Date(startDate.setTime(Math.random()*diff));
+      var r = {name:name,score:score,dob:dob};
+      records[name] = r;
+      arr.push(r);
+    }
     jUtil.timer(function(){
       $("#wrapperTable").jFormat2("#table1000Row",records);
+      $("#wrapperTableDirect").jFormat2("#table1000Row",arr);
     });
+
+
   </script>
 </body>
 </html>

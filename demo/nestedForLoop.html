@@ -33,12 +33,12 @@
         <th>Score</th>
         <th>DOB</th>
       </tr>
-      @foreach(var record in model){
+       @for(var row in model){
         <tr>
-          <td>@record.name</td>
-          <td>@record.score</td>
-          <td>@record.dob</td>
-        <tr>
+          @for(var key in model[row]){
+            <td><strong>@key:</strong>@model[row][key]</td>
+          }
+        </tr>
       }
     </table>
   </script>
@@ -60,8 +60,8 @@
       arr.push(r);
     }
 
-    $("#wrapperTable").jFormat("#table1000Row",records);
-    $("#wrapperTableDirect").jFormat("#table1000Row",arr);
+    $("#wrapperTable").jFormat2("#table1000Row",records);
+    $("#wrapperTableDirect").jFormat2("#table1000Row",arr);
   </script>
 </body>
 </html>

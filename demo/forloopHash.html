@@ -25,7 +25,7 @@
 </style>
 </head>
 <body>
-  <h1>For loop with array</h1>
+  <h1>For loop with hash</h1>
   <script id="table1000Row" type="text/template">
     <h2>Array model</h2>
     <table>
@@ -35,27 +35,27 @@
         <th>Score</th>
         <th>DOB</th>
       </tr>
-      @foreach(var record in model){
+      @for(var i in model){
         <tr>
-          <td>@record.order</td>
-          <td>@record.name</td>
-          <td>@record.score</td>
-          <td>@record.dob</td>
+          <td>@model[i].order</td>
+          <td>@model[i].name</td>
+          <td>@model[i].score</td>
+          <td>@model[i].dob</td>
         <tr>
       }
     </table>
   </script>
   <div id="wrapperTable" class="scrollTable"></div>
   <script>
-        var records = [];
+        var records = {};
         var startDate = new Date(1970,01,01);
         var endDate = new Date();
         var diff = endDate - startDate;
-        for(var i=0;i<10;i++){
+        for(var i=0;i<100;i++){
             var name = Math.random().toString(36).substring(2);
             var score = Math.floor(Math.random()*1001);
             var dob = new Date(startDate.setTime(Math.random()*diff));
-            records.push({order:i+1,name:name,score:score,dob:dob});
+            records[name] = {order:i+1,name:name,score:score,dob:dob};
         }
 
         //===========================================================

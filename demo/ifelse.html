@@ -9,79 +9,76 @@
 </head>
 <body>
 <script id="ifelse" type="text/template">
-	<h2>If, else if, else statement</h2>
-	<p>
-	<h3>if only</h3>
-	@if(model.condition1){
-		<strong>Get if statement</strong>
-	}
-	</p>
-
-	<p>
-	<h3>show if condition</h3>
-	@if(model.condition1){
-		<strong>Get if statement</strong>
-	}
-	@else{
-		<strong>not show</strong>
-	}	
-	</p>
-
-	<p>
-	<h3>Show else condition</h3>
-	@if(model.condition2){
-		<strong>not show</strong>
-	}
-	@else{
-		<strong>get else statement</strong>
-	}
-	</p>
-
-	<p>
-	<h3>Show if else condition</h2>
-	@if(model.condition3){
-		<strong>not show</strong>
-	}
-	@else if(model.condition4){
-		<strong> get else if </strong>
-	}
-	@else{
-		<strong>not show</strong>
-	}
-	</p>
-	
-	<p>
-	<h3>show else condition in if else if<h4>
-	@if(model.condition5){
-		<strong>not show</strong>
-	}
-	@else if(model.condition6){
-		<strong> not show </strong>
-	}
-	@else if(model.condition7){
-		<strong> not show </strong>
-	}
-	@else if(model.condition8){
-		<strong> not show </strong>
-	}
-	@else{
-		<strong>get last else</strong>
-	}
-	</p>
+  <h2>If, else if, else statement</h2>
+  <p>
+  <h3>if only</h3>
+  @if(model.condition1){
+    <strong>Get if statement</strong>
+  }
+  </p>
+  <p>
+  <h3>show if condition</h3>
+  @if(model.condition1){
+    <strong>Get if statement</strong>
+  }
+  @else{
+    <strong>not show</strong>
+  }
+  </p>
+  <p>
+  <h3>Show else condition</h3>
+  @if(model.condition2){
+    <strong>not show</strong>
+  }
+  @else{
+    <strong>get else statement</strong>
+  }
+  </p>
+  <p>
+  <h3>Show if else condition</h2>
+  @if(model.condition3){
+    <strong>not show</strong>
+  }
+  @else if(model.condition4 == 1){
+    <strong> get else if </strong>
+  }
+  @else{
+    <strong>not show</strong>
+  }
+  </p>
+  <p>
+  <h3>show else condition in if else if<h4>
+  @if(model.condition5 != 2){
+    <strong>not show</strong>
+  }
+  @else if(model.condition6 > 3){
+    <strong> not show </strong>
+  }
+  @else if(model.condition7 == ""){
+    <strong> not show </strong>
+  }
+  @else if(model.condition8){
+    <strong> not show undefined </strong>
+  }
+  @else{
+    <strong>get last else</strong>
+  }
+  </p>
 </script>
 
 <div id="ifElseWrapper"></div>
-	<script>		       	
-		var model3 = {
-			condition1: true,
-			condition2: false,
-			condition3: false,
-			condition4: true,
-			condition5: false,
-			condition6: false
-		}
-		$("#ifElseWrapper").jFormat("#ifelse",model3);
-	</script>
-		
+  <script>
+    var model3 = {
+      condition1: true,
+      condition2: false,
+      condition3: false,
+      condition4: 1,
+      condition5: 2,
+      condition6: 3,
+      condition7: "something"
+    }
+    $("#ifElseWrapper").jFormat2("#ifelse",model3);
+  </script>
+
 </body>
 </html>
