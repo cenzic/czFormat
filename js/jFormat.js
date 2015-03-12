@@ -30,13 +30,14 @@
     t = t.replace(/"/g,'\\"');
     t = t.replace(/@{2}/g,"{##}");
     t = replaceHelper(t);
-    t = replaceIf(t);
+    t = replaceHandler(t, true);
+    //t = replaceIf(t);
     //t = replaceElseif(t);
     //t = replaceElse(t);
-    t = replaceForeach(t);
-    t = replaceForloop(t);
+    //t = replaceForeach(t);
+    //t = replaceForloop(t);
     //t = t.replace(/\}/g,'"; } return tmp;})() + "');
-    t = t.replace(/@model((\.[\w.\(\)]+)*(\['?.+?'?\])*(\.[\w.\(\)]+)*)+/g,function(m0){return '" + helpers.htmlEscape(' + m0.substr(1) + ') + "'});
+    t = t.replace(/@model((\.[\w.\(\)]+)*(\['?.+?'?\])*(\.[\w.\(\)]+)*)+/g, function(m0){return '" + helpers.htmlEscape(' + m0.substr(1) + ') + "'});
     t = t.replace(/@([\w.\(\)]+)/g,function(m0, m1){return '" + ' + m1 + ' + "'});
     t = t.replace(/\{##\}/g,"");
     t = t.replace(/\n/g,'"+\n"');
@@ -44,46 +45,86 @@
     return t;
   }
 
+  function replaceHandler(t, isRecursive){
+    var r = /@for\(|@foreach\(|@if\(/;
+    var m = t.match(r);
+    if(m){
+      switch(m[0]){
+      case "@for(":
+        t = replaceForloop(t);
+        break;
+      case "@foreach(":
+        t = replaceForeach(t);
+          break;
+      case "@if(":
+        t = replaceIf(t);
+        break;
+      default:
+        break;
+      }
+    }
+    if(isRecursive && r.test(t)){
+      return replaceHandler(t, isRecursive);
+    }
+    return t;
+  }
+
   function replaceHelper(t){
     for(var i in helpers){
-      var regex = new RegExp("@"+i,"g");
-      t = t.replace(regex,"@helpers."+i );
+      var regex = new RegExp("@"+i+"(\\(.*\\))","g");
+      t = t.replace(regex,function(m0,m1){
+        return "\" + helpers."+i + revert(m1) + " + \"";
+      });
     }
     return t;
   }
 
   function replaceForeach(t){
-    var out = t.replace(/@foreach\(var (.+) in ([^\)]*)\)\{\n/g, function(m0, m1, m2){
-      var t = '" + (function(){' +
-      'var tmp = "";' +
-      'for(var i in ' + m2 + '){' +
-      'var ' + m1 + ' = ' + m2 + '[i];' +
-      'tmp += "';
-      return t;
-    });
-    var startIndex = t.indexOf("@foreach");
-    return closeStatement(out, startIndex);
+    console.log("replaceForeach");
+    var r = /@foreach\(var (.+) in ([^\)]*)\)\{\n/;
+    var m = r.exec(t);
+    if(!m) return t;
+    var startIndex = t.indexOf(m[0]);
+    var out = '" + (function(){' +
+    'var tmp = "";' +
+    'for(var i in ' + m[2] + '){' +
+    'var ' + m[1] + ' = ' + m[2] + '[i];' +
+    'tmp += "';
+    t = t.replace(m[0], out);
+    t = closeStatement(t, startIndex, true);
+    return t;
   }
 
   function replaceForloop(t){
-    var out = t.replace(/@(for\([^\)]+\)\{)\n/g, function(m0, m1){
-      var t = '" + (function(){' +
-      'var tmp = "";' +  m1 +
-      'tmp += "';
-      return t;
-    });
-    var startIndex = t.indexOf("@for");
-    return closeStatement(out, startIndex);
+    console.log("replaceForloop");
+    var r = /@(for\(.+\)\{)\n/;
+    var m = r.exec(t);
+    if(!m) return t;
+    var startIndex = t.indexOf(m[0]);
+    var out = '" + (function(){' +
+    'var tmp = "";' +  m[1] +
+    'tmp += "';
+    t = t.replace(m[0], out);
+    t = closeStatement(t, startIndex, true);
+    return t;
+  }
+  //t = t.replace(/\\/,'\\\\');
+  //t = t.replace(/"/g,'\\"');
+  function revert(t){
+    console.log(revert);
+    t = t.replace(/\\{2}/g,'\\');
+    t = t.replace(/\\"/g,'"');
+    return t;
   }
 
   function replaceIf(t){
-    var r = /@(if\([^\)]+\)\{)\n/g;
+    var r = /@(if\(.+\)\{)\n/g;
     var m;
     while(m = r.exec(t)){
       var startIndex = t.indexOf(m[0]);
       console.log("replaceIf | m: %s", m[0]);
       var out = '" + (function(){' +
-      'var tmp = "";' +  m[1].replace(/\\"/g,"'") +
+      'var tmp = "";' +  revert(m[1]) +
       'tmp += "';
       t = t.replace(m[0], out);
       t = closeStatement(t, startIndex);
@@ -92,15 +133,17 @@
   }
 
   function replaceElseif(t){
+    console.log("replaceElseif");
     var r = /@(else if\([^\)]+\)\{)\n/;
     var m = r.exec(t);
     var startIndex = t.indexOf(m[0]);
-    t = t.replace(m[0], m[1].replace(/\\"/g,"'") + " tmp += \"");
+    t = t.replace(m[0], revert(m[1]) + " tmp += \"");
     t = closeStatement(t, startIndex);
     return t;
   }
 
   function replaceElse(t){
+    console.log("replaceElse");
     var r = /@else\{\n/;
     var m = r.exec(t)
     var startIndex = t.indexOf(m[0]);
@@ -111,27 +154,38 @@
 
   //    t = t.replace(/\}/g,'"; } return tmp;})() + "');
   function closeStatement(t, startIndex, closed){
-    console.log("closeStatement");
-    var closeIndex = t.indexOf("}",startIndex);
-    var forIndex = t.indexOf("@for", startIndex);
+    console.log("closeStatement: startIndex: %s, closed: %s", startIndex, closed);
+    var closeIndex = t.indexOf("}\n",startIndex);
+
+    var ifIndex = t.indexOf("@if(", startIndex);
+    ifIndex = ifIndex!=-1 ? ifIndex : Number.MAX_VALUE;
+    if(closeIndex > ifIndex){
+      t = replaceIf(t);
+      closeIndex = t.indexOf("}\n",startIndex);
+    }
+
+    var forIndex = t.indexOf("@for(", startIndex);
     forIndex = forIndex!=-1 ? forIndex : Number.MAX_VALUE;
     if(closeIndex > forIndex){
-      replaceForloop(t);
-      return closeStatement(t, closeIndex, closed);
+      t = replaceForloop(t);
+      closeIndex = t.indexOf("}\n",startIndex);
     }
-    var foreachIndex = t.indexOf("@foreach", startIndex);
+
+    var foreachIndex = t.indexOf("@foreach(", startIndex);
     foreachIndex = foreachIndex!=-1 ? foreachIndex : Number.MAX_VALUE;
-    if(closeIndex > forIndex){
-      replaceForeach(t);
-      return closeStatement(t, closeIndex, closed);
+    if(closeIndex > foreachIndex){
+      t = replaceForeach(t);
+      closeIndex = t.indexOf("}\n",startIndex);
     }
 
     if(closed){
       console.log("closed block");
       return t.replace("}\n",'"; } return tmp;})() + "');
     }
+
     var elseifIndex = t.indexOf("@else if", startIndex);
     if(elseifIndex!=-1){
+      console.log("has else if block");
       var tmp = t.substring(closeIndex+1,elseifIndex);
       if(!tmp.match(/\S/g,'')){
         console.log("calling replace else if");
@@ -143,7 +197,9 @@
 
     var elseIndex = t.indexOf("@else{\n", startIndex);
     if(elseIndex!=-1){
+      console.log("has else block");
       var tmp = t.substring(closeIndex+1,elseIndex);
+      console.log("tmp: %s", tmp);
       if(!tmp.match(/\S/g,'')){
         console.log("calling replace else");
         t = t.replace("}\n","\";}");
@@ -155,13 +211,22 @@
     return t.replace("}\n",'"; } return tmp;})() + "');
   }
 
-
+  function partial(id, model){
+    var formatted;
+    //this only work because getTemplate is in synchronous condition
+    getTemplate(id, function(template){;
+      var t = replace(template);
+      formatted = jEval(model, t);
+    });
+    return formatted;
+  }
 
   var helpers = {
       raw : function(s) {
         return s;
       },
-      htmlEscape: htmlEscape
+      htmlEscape: htmlEscape,
+      partial: partial
     };
 
   function jEval(model, func){
@@ -172,14 +237,42 @@
     return out;
   }
 
+  /**
+   * do a different approach. load all template ahead of time and then let the eval function to compute the template.
+   * as long as template available it's eval synchronously.
+   */
+  function loadTemplate(id,callback){
+    console.log("loadTemplate: %s", id);
+    getTemplate(id,function(template){
+      if (template.indexOf("@partial(") != -1) {
+        var regex = /@partial\((.*),.*\)/g;
+        var total = template.match(regex).length;
+        var m;
+        var count = 0;
+        while(m = regex.exec(template)){
+          loadTemplate(m[1], function(){
+            count++;
+            if(count == total){
+              if(callback) callback();
+            }
+          });
+        }
+      }
+      else{
+        if(callback) callback();
+      }
+    });
+  }
+
   $.jFormat2 = function(id, model, callback){
-    var t = $(id).html();
-    t = replace(t);
-    var formatted = jEval(model, t);
-    if(callback){
-      callback.call(this,formatted);
-    }
-    return formatted;
+    loadTemplate(id, function(){
+      console.log("load template complete, call partial");
+      var formatted = partial(id, model);
+      if(callback){
+        callback.call(this,formatted);
+      }
+      return formatted;
+    });
   }
 
   $.jFormat = function(id, model) {
@@ -241,40 +334,19 @@
 
   // ========================== Private functions ================================
   function getTemplate(id, callback) {
-    var template;
-    if (callback) {
-      if (id.charAt(0) == "#") {
-        var jTemplate = $(id);
-        if (jTemplate.length != 1) {
-          // console.warn("template %s not found", id);
-          callback("");
-          return "";
-        }
-        template = jTemplate.html();
-        callback(template);
-      } else if (id.charAt(0) == "@") {
-        var url = getFullUrl(id.substring(1));
-        getTemplateAsync(url, callback);
-      } else {
-        template = id;
-        callback(template);
+    if (id.charAt(0) == "#") {
+      var jTemplate = $(id);
+      if (jTemplate.length != 1) {
+        throw new Error("template not found");
       }
+      callback(jTemplate.html());
+    } else if (id.charAt(0) == "@") {
+      var url = getFullUrl(id.substring(1));
+      getTemplateAsync(url, callback);
     } else {
-      if (id.charAt(0) == "#") {
-        var jTemplate = $(id);
-        if (jTemplate.length != 1) {
-          // console.warn("template %s not found", id);
-          return "";
-        }
-        template = jTemplate.html();
-      } else if (id.charAt(0) == "@") {
-        var url = getFullUrl(id.substring(1));
-        template = getTemplateSync(url);
-      } else {
-        template = id;
-      }
+      //provide as a template string
+      callback(id);
     }
-    return template;
   }
 
   function getFullUrl(path) {

@@ -1,0 +1,59 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>simple render template</title>
+<script src="../js/jquery-1.9.1.js"></script>
+<script src="../js/jFormat.js"></script>
+</head>
+<body>
+  <h1>simple partial</h1>
+<template id="simpleTemplate" type="text/template">
+<h2>simple model</h2>
+<p>
+  <strong>'title': </strong>@model.title
+</p>
+<p>
+  <strong>name: </strong>@model.name
+</p>
+<p>
+  <strong>age: </strong>@raw(model.age)
+</p>
+@partial("#partialTemplate", model)
+</template>
+<template id="partialTemplate" type="text/template">
+<h2>partial template</h2>
+<p>
+  <strong>undefined property: @model.undefined</strong>
+</p>
+<p>
+  <strong>array index</strong>: @model.arr[1]
+</p>
+<p>
+  <strong>multiple level property</strong>: @model.property.level2.level3
+</p>
+<p>
+  <strong>multiple level property index style</strong>: @model["property with space"].level2[2]
+</p>
+</template>
+  <div id="simpleWrapper"></div>
+
+  <script>
+        var model = {
+            "title": "test <title>",
+            "name": "test 'name'",
+            "age": "<i>unescapeme</i>",
+            arr: [1, 2, 3],
+            property:{
+              level2: {
+                level3: "level 3"
+              }
+            },
+            "property with space":{
+              level2: ["a", "b", "c"]
+            }
+        }
+        $("#simpleWrapper").jFormat2("#simpleTemplate",model);
+  </script>
+</body>
+</html>

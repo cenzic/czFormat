@@ -6,25 +6,25 @@
 <script src="../js/jquery-1.9.1.js"></script>
 <script src="../js/jFormat.js"></script>
 <style>
-	.scrollTable{
-		border: black 1px solid;
-		overflow: auto;
-		height:400px;
-		width: 800px;
-		text-align: center;
-	}
-	.scrollTable table{
-		border-collapse: collapse;
-		width: 95%;
-		margin: auto;
-	}
-	.scrollTable table td, .scrollTable table th{
-		border: black 1px solid;
-	}
+  .scrollTable{
+    border: black 1px solid;
+    overflow: auto;
+    height:400px;
+    width: 800px;
+    text-align: center;
+  }
+  .scrollTable table{
+    border-collapse: collapse;
+    width: 95%;
+    margin: auto;
+  }
+  .scrollTable table td, .scrollTable table th{
+    border: black 1px solid;
+  }
 </style>
 </head>
 <body>
-	<h1>partial for loop render</h1>
+  <h1>partial for loop render</h1>
     <script id="complexPartial" type="text/template">
     <h2>Complex Partial: render partial template in for loop</h2>
     <p>
@@ -58,9 +58,9 @@
     <td>@model.name</td>
     <td>@model.score</td>
     <td>@model.dob</td>
-</script>        
+</script>
     <div id="complexPartialWrapper" class="scrollTable"></div>
-	<script>		
+  <script>
         var records = [];
         var startDate = new Date(1970,01,01);
         var endDate = new Date();
@@ -70,15 +70,15 @@
             var score = Math.floor(Math.random()*1001);
             var dob = new Date(startDate.setTime(Math.random()*diff));
             records.push({order:i+1,name:name,score:score,dob:dob});
-        }        
+        }
         var model2 = {
             "class":"Huge class",
             "professor":"It's me",
             "students":records,
             "note":"test complex model with array and simple property"
-        }        
-        $("#complexPartialWrapper").jFormat("#complexPartial", model2);        
-	</script>
-		
+        }
+        $("#complexPartialWrapper").jFormat("#complexPartial", model2);
+  </script>
+
 </body>
 </html>

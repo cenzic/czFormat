@@ -1,0 +1,124 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>simple if else</title>
+<script src="../js/jquery-1.9.1.js"></script>
+<script src="../js/jFormat.js"></script>
+
+</head>
+<body>
+<script id="ifelse" type="text/template">
+  <h2>If, else if, else statement</h2>
+  <p>
+  <h3>if only</h3>
+  @if(model.condition1){
+    <strong>Get if statement - with for loop</strong><br/>
+    @for(var i = 0; i<5; i++){
+      <span>test something</span><br/>
+    }
+  }
+  </p>
+  <p>
+  <h3>show if condition</h3>
+  @if(model.condition1){
+    <strong>Get if statement - with for loop</strong><br/>
+    @for(var i = 0; i<5; i++){
+      <span>test something</span><br/>
+    }
+  }
+  @else{
+    <strong>not show</strong>
+    @for(var i = 0; i<5; i++){
+      <span>test something</span><br/>
+    }
+  }
+  </p>
+
+  <p>
+  <h3>Show else condition</h3>
+  @if(model.condition2){
+    <strong>not show</strong>
+    @for(var i = 0; i<5; i++){
+      <span>test something</span><br/>
+    }
+  }
+  @else{
+    <strong>get else statement - with for loop</strong><br/>
+    @for(var i = 0; i<5; i++){
+      <span>test something</span><br/>
+    }
+  }
+  </p>
+  <p>
+  <h3>Show if else condition</h2>
+  @if(model.condition3){
+    <strong>not show</strong><br/>
+    @for(var i = 0; i<5; i++){
+      <span>test something</span><br/>
+    }
+  }
+  @else if(model.condition4 == 1){
+    <strong> get else if </strong><br/>
+    @for(var i in model){
+      <span>@i</span><br/>
+    }
+  }
+  @else{
+    <strong>not show</strong><br/>
+    @for(var i = 0; i<5; i++){
+      <span>test something</span><br/>
+    }
+  }
+  </p>
+  <p>
+  <h3>show else condition in if else if</h3>
+  @if(model.condition5 != 2){
+    <strong>not show</strong><br/>
+    @for(var i = 0; i<5; i++){
+      <span>test something</span><br/>
+    }
+  }
+  @else if(model.condition6 > 3){
+    <strong> not show </strong><br/>
+    @for(var i = 0; i<5; i++){
+      <span>test something</span><br/>
+    }
+  }
+  @else if(model.condition7 == ""){
+    <strong> not show </strong><br/>
+    @for(var i = 0; i<5; i++){
+      <span>test something</span><br/>
+    }
+  }
+  @else if(model.condition8){
+    <strong> not show undefined </strong><br/>
+    @for(var i in model){
+      <span>@i</span><br/>
+    }
+  }
+  @else{
+    <strong>get last else </strong><br/>
+    @foreach(var i in model){
+      <span>@i</span><br/>
+    }
+  }
+  </p>
+</script>
+
+<div id="ifElseWrapper"></div>
+  <script>
+    var model3 = {
+      condition1: true,
+      condition2: false,
+      condition3: false,
+      condition4: 1,
+      condition5: 2,
+      condition6: 3,
+      condition7: "something"
+    }
+    $("#ifElseWrapper").jFormat2("#ifelse",model3);
+  </script>
+
+</body>
+</html>
