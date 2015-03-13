@@ -16,9 +16,12 @@
   };
 
   $.fn.jFormat2 = function(id, model, callback) {
+    var tmp = window.model;
+    window.model = model;
     var self = this;
     $.jFormat2(id, model, function(formattedText) {
       self.html(formattedText);
+      window.model = tmp;
       if (callback)
         callback.call(self, formattedText);
     });
@@ -26,22 +29,24 @@
 
   function replace(t){
     t = t.replace(/\\/,'\\\\');
+    t = t.replace(/\r\n/g,'\n');
     t = t.replace(/@model((\.[\w.\(\)]+)*(\[".+?"\])*(\.[\w.\(\)]+)*)+/g,function(m0){return m0.replace(/"/g,"'")});
     t = t.replace(/"/g,'\\"');
     t = t.replace(/@{2}/g,"{##}");
     t = replaceHelper(t);
     t = replaceHandler(t, true);
-    //t = replaceIf(t);
-    //t = replaceElseif(t);
-    //t = replaceElse(t);
-    //t = replaceForeach(t);
-    //t = replaceForloop(t);
-    //t = t.replace(/\}/g,'"; } return tmp;})() + "');
-    t = t.replace(/@model((\.[\w.\(\)]+)*(\['?.+?'?\])*(\.[\w.\(\)]+)*)+/g, function(m0){return '" + helpers.htmlEscape(' + m0.substr(1) + ') + "'});
-    t = t.replace(/@([\w.\(\)]+)/g,function(m0, m1){return '" + ' + m1 + ' + "'});
-    t = t.replace(/\{##\}/g,"");
+    t = replaceProperties2(t, "model");
+    t = t.replace(/\{##\}/g,"@");
     t = t.replace(/\n/g,'"+\n"');
     t = '"' + t + '"';
+    return t;
+  }
+
+
+
+  function replaceProperties2(t, name){
+    var regex = new RegExp("@"+name+"((\\.[\\w.\\(\\)]+)*(\\[['\"]?.+?['\"]?\\])*(\\.[\\w.\\(\\)]+)*)+","g");
+    t = t.replace(regex, function(m0){return '" + helpers.htmlEscape(' + revert(m0.substr(1)) + ') + "'});
     return t;
   }
 
@@ -91,6 +96,7 @@
     'var ' + m[1] + ' = ' + m[2] + '[i];' +
     'tmp += "';
     t = t.replace(m[0], out);
+    t = replaceProperties2(t,m[1]);
     t = closeStatement(t, startIndex, true);
     return t;
   }
@@ -100,11 +106,18 @@
     var r = /@(for\(.+\)\{)\n/;
     var m = r.exec(t);
     if(!m) return t;
+    r = /@for\(var (.+) in ([^\)]*)\)\{\n/;
+    var mKey = t.match(r);
+    if(mKey){
+      var key = mKey[1];
+      t = replaceProperties2(t,key);
+    }
     var startIndex = t.indexOf(m[0]);
     var out = '" + (function(){' +
     'var tmp = "";' +  m[1] +
     'tmp += "';
     t = t.replace(m[0], out);
+
     t = closeStatement(t, startIndex, true);
     return t;
   }
@@ -212,12 +225,16 @@
   }
 
   function partial(id, model){
+    console.log("partial | id: %s", id);
+    console.log(model);
     var formatted;
     //this only work because getTemplate is in synchronous condition
     getTemplate(id, function(template){;
+      console.log("partial | getTemplate come back");
       var t = replace(template);
       formatted = jEval(model, t);
     });
+    console.log("partial | return");
     return formatted;
   }
 
@@ -241,17 +258,27 @@
    * do a different approach. load all template ahead of time and then let the eval function to compute the template.
    * as long as template available it's eval synchronously.
    */
-  function loadTemplate(id,callback){
+  function loadTemplate(id, model, callback){
     console.log("loadTemplate: %s", id);
+    var m = id.match(/model(.+)/);
+    if(m){
+      id = getObjectProperty(model, m[1]);
+      console.log("eval id: %s", id);
+    }
+    if(id.match(/^["'].+["']$/)){
+      id = id.slice(1,-1);
+    }
     getTemplate(id,function(template){
+      console.log("loadTemplate | getTemplate come back id: %s", id);
       if (template.indexOf("@partial(") != -1) {
         var regex = /@partial\((.*),.*\)/g;
         var total = template.match(regex).length;
         var m;
         var count = 0;
         while(m = regex.exec(template)){
-          loadTemplate(m[1], function(){
+          loadTemplate(m[1], model, function(){
             count++;
+            console.log("loadTemplate | partial template count: %d id: %s", count, id);
             if(count == total){
               if(callback) callback();
             }
@@ -259,17 +286,22 @@
         }
       }
       else{
+        console.log("loadTemplate | no partial, calling callback id: %s", id);
         if(callback) callback();
       }
     });
+
   }
 
   $.jFormat2 = function(id, model, callback){
-    loadTemplate(id, function(){
-      console.log("load template complete, call partial");
+    loadTemplate(id, model, function(){
+      console.log("$.jFormat2 | load template complete, call partial");
       var formatted = partial(id, model);
       if(callback){
+        console.log("$.jFormat2 | calling callback");
         callback.call(this,formatted);
+      }else{
+        console.log("$.jFormat2 | callback not defined");
       }
       return formatted;
     });
@@ -340,7 +372,7 @@
         throw new Error("template not found");
       }
       callback(jTemplate.html());
-    } else if (id.charAt(0) == "@") {
+    } else if (id.charAt(0) == "@" || id.charAt(0) == "~") {
       var url = getFullUrl(id.substring(1));
       getTemplateAsync(url, callback);
     } else {
@@ -352,27 +384,6 @@
   function getFullUrl(path) {
     path = jFormatOptions.paths[path] || (path + ".html");
     return jFormatOptions.baseUrl + "/" + path;
-  }
-
-  function getTemplateSync(url) {
-    if (jFormatCache[url] !== undefined) {
-      return jFormatCache[url].data;
-    }
-    var template = "";
-    jFormatCache[url] = new jCache(callback);
-    $.ajax({
-      url : url,
-      async : false,
-      success : function(data) {
-        template = data;
-        jFormatCache[url].isReady = true;
-        jFormatCache[url].data = data;
-      },
-      error : function() {
-        jFormatCache[url] = "";
-      }
-    });
-    return template;
   }
 
   function getTemplateAsync(url, callback) {

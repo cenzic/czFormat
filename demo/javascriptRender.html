@@ -7,44 +7,44 @@
 <script src="../js/jFormat.js"></script>
 </head>
 <body>
-	<h1>javascript render</h1>
+  <h1>javascript render</h1>
 
-<script id="simpleJavascript" type="text/template">
+<template id="simpleJavascript" type="text/template">
 <h2>simple model</h2>
 <p>
-	<strong>'title': </strong>@model.title
+  <strong>'title': </strong>@model.title
 </p>
 <p>
-	<strong>name: </strong>@model.name
+  <strong>name: </strong>@model.name
 </p>
 <p>
-	<strong>age: </strong>@raw(model.age)
+  <strong>age: </strong>@raw(model.age)
 </p>
 <p>
-	<strong>not defined property: @model.notdefined</strong>
-</p>		
-<@script>
-	console.log("my name is @model.name");
-	var arr = @model.arr;
-	for(var i in arr){
-		console.log("%s = %s", i, arr[i]);
-	}
-</@script>		
+  <strong>not defined property: @model.notdefined</strong>
+</p>
+<script>
+  console.log("my name is: " + model.name);
+  var arr = model.arr;
+  for(var i in arr){
+    console.log("%s = %s", i, arr[i]);
+  }
+</script>
+</template>
+
+  <div id="simpleJavascriptWrapper"></div>
+
+<script>
+  var model1 = {
+      "title": "test <title>",
+      "name": "test 'name'",
+      "age": "<i>unescapeme</i>",
+      "arr": [1,2,3,4,5]
+  }
+
+  $("#simpleJavascriptWrapper").jFormat2("#simpleJavascript",model1);
+
 </script>
 
-	<div id="simpleJavascriptWrapper"></div>	
-
-<script>		        
-	var model1 = {
-	    "title": "test <title>",
-	    "name": "test 'name'",
-	    "age": "<i>unescapeme</i>",
-	    "arr": [1,2,3,4,5]
-	}
-    
-	$("#simpleJavascriptWrapper").jFormat("#simpleJavascript",model1);
-								
-</script>
-		
 </body>
 </html>

@@ -7,20 +7,20 @@
 <script src="../js/jFormat.js"></script>
 </head>
 <body>
-	<h1>dynamic remote template</h1>
-	<script id="dynamicTemplate" type="text/template">
+  <h1>dynamic remote template</h1>
+  <script id="dynamicTemplate" type="text/template">
 <h2>main template</h2>
 <p>
-	<strong>'title': </strong>@model.title
+  <strong>'title': </strong>@model.title
 </p>
 <p>
-	<strong>@model.renderCount</strong>
+  <strong>@model.renderCount</strong>
 </p>
 <div>
-	$.jFormat("@model.template", @model.data)
+  @partial(model.template, model.data)
 </div>
-	</script>
-	<div id="dynamicTemplateWrapper"></div>
+  </script>
+  <div id="dynamicTemplateWrapper"></div>
 
 <script id="partialRow" type="text/template">
 <td>@model.order</td>
@@ -29,8 +29,8 @@
 <td>@model.dob</td>
 </script>
 
-	<script>		
-	var records = [];
+  <script>
+  var records = [];
     var startDate = new Date(1970,01,01);
     var endDate = new Date();
     var diff = endDate - startDate;
@@ -39,19 +39,19 @@
         var score = Math.floor(Math.random()*1001);
         var dob = new Date(startDate.setTime(Math.random()*diff));
         records.push({order:i+1,name:name,score:score,dob:dob});
-    }  
-    
-	var model = {
-    	"title": "test title",
-    	"template":"@partialTable",
+    }
+
+  var model = {
+      "title": "test title",
+      "template":"@partialTable",
         "data": records,
         "renderCount": 1,
     }
-	$.jFormat.init({baseUrl: "http://localhost/github/jFormat/views"});
-	
-	$("#dynamicTemplateWrapper").jFormat("#dynamicTemplate",model);
-	
-	</script>
-		
+  $.jFormat.init({baseUrl: "http://localhost/github/jFormat/views"});
+
+  $("#dynamicTemplateWrapper").jFormat2("#dynamicTemplate",model);
+
+  </script>
+
 </body>
 </html>

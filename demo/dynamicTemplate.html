@@ -8,18 +8,19 @@
 </head>
 <body>
   <h1>dynamic template</h1>
-  <script id="dynamicTemplate" type="text/template">
+  <template id="dynamicTemplate" type="text/template">
 <h2>main template</h2>
 <p>
   <strong>'title': </strong>@model.title
 </p>
 <p>
-  <strong>@model.renderCount</strong>
+  <strong>render count: @model.renderCount</strong>
 </p>
 <div>
-  $.jFormat("@model.template", @model.data)
+  <strong>dynamic template as partial</strong></br>
+  @partial(model.template, model.data)
 </div>
-  </script>
+  </template>
   <div id="dynamicTemplateWrapper"></div>
 
   <script>
@@ -43,7 +44,7 @@
     }
   $.jFormat.init({baseUrl: "http://localhost/github/jFormat/views"});
 
-  $("#dynamicTemplateWrapper").jFormat("#dynamicTemplate",model);
+  $("#dynamicTemplateWrapper").jFormat2("#dynamicTemplate",model);
   </script>
 
 </body>
