@@ -34,7 +34,6 @@
     }
   }
   </p>
-
   <p>
   <h3>Show else condition</h3>
   @if(model.condition2){
@@ -50,6 +49,7 @@
     }
   }
   </p>
+
   <p>
   <h3>Show if else condition</h2>
   @if(model.condition3){
@@ -71,39 +71,6 @@
     }
   }
   </p>
-  <p>
-  <h3>show else condition in if else if</h3>
-  @if(model.condition5 != 2){
-    <strong>not show</strong><br/>
-    @for(var i = 0; i<5; i++){
-      <span>test something</span><br/>
-    }
-  }
-  @else if(model.condition6 > 3){
-    <strong> not show </strong><br/>
-    @for(var i = 0; i<5; i++){
-      <span>test something</span><br/>
-    }
-  }
-  @else if(model.condition7 == ""){
-    <strong> not show </strong><br/>
-    @for(var i = 0; i<5; i++){
-      <span>test something</span><br/>
-    }
-  }
-  @else if(model.condition8){
-    <strong> not show undefined </strong><br/>
-    @for(var i in model){
-      <span>@i</span><br/>
-    }
-  }
-  @else{
-    <strong>get last else </strong><br/>
-    @foreach(var i in model){
-      <span>@i</span><br/>
-    }
-  }
-  </p>
 </script>
 
 <div id="ifElseWrapper"></div>
@@ -117,7 +84,7 @@
       condition6: 3,
       condition7: "something"
     }
-    $("#ifElseWrapper").jFormat2("#ifelse",model3);
+    $("#ifElseWrapper").jFormat("#ifelse",model3);
   </script>
 
 </body>

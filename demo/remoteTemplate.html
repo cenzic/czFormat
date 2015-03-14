@@ -49,7 +49,7 @@
       "age": "<i>unescapeme</i>"
     }
 
-    $("#wrapperTestMe").jFormat2("@simple",model1);
+    $("#wrapperTestMe").jFormat("@simple",model1);
 
     //=============================== if else block ===================================
 
@@ -61,7 +61,7 @@
       condition5: false,
       condition6: false
     }
-    $("#ifElseWrapper").jFormat2("@ifelse",model3);
+    $("#ifElseWrapper").jFormat("@ifelse",model3);
 
   //render array model
     var records = [];
@@ -74,7 +74,7 @@
       var dob = new Date(startDate.setTime(Math.random()*diff));
       records.push({order:i+1,name:name,score:score,dob:dob});
     }
-    $("#wrapperTable").jFormat2("@table",records);
+    $("#wrapperTable").jFormat("@table",records);
 
   //render complex table;
     var model2 = {
@@ -83,9 +83,9 @@
         "students":records,
         "note":"test complex model with array and simple property"
     }
-    $("#complexModelWrapper").jFormat2("@complex",model2);
+    $("#complexModelWrapper").jFormat("@complex",model2);
 
-    $("#partialRenderWrapper").jFormat2("@partial",model2);
+    $("#partialRenderWrapper").jFormat("@partial",model2);
   </script>
 
 </body>
