@@ -7,44 +7,44 @@
 <script src="../js/jFormat.js"></script>
 </head>
 <body>
-	<h1>Format block of code with jquery similar to backbone render</h1>
+  <h1>Format block of code with jquery similar to backbone render</h1>
 <script id="testme" type="text/template">
 <h2>simple model</h2>
 <p>
-	<strong>'title': </strong>@model.title
+  <strong>'title': </strong>@model.title
 </p>
 <p>
-	<strong>name: </strong>@model.name
+  <strong>name: </strong>@model.name
 </p>
 <p>
-	<strong>age: </strong>@raw(model.age)
+  <strong>age: </strong>@raw(model.age)
 </p>
 <p>
-	<strong>not defined property: @model.notdefined</strong>
-</p>				
+  <strong>not defined property: @model.notdefined</strong>
+</p>
 </script>
 <script id="multiPartial" type="text/template">
 <div>
-	$.jFormat("#testme",@model)
+  @partial("#testme",model)
 </div>
 <div>
-	$.jFormat("@simple",@model)
+  @partial("@simple",model)
 </div>
 </script>
 <div id="wrapperTestMe"></div>
-	
 
-<script>		       
+
+<script>
        var model = {
            "title": "test <title>",
            "name": "test 'name'",
            "age": "<i>unescapeme</i>"
        }
        $.jFormat.init({
-           baseUrl: "http://localhost/github/jFormat/views"            
+           baseUrl: "http://localhost/github/jFormat/views"
        });
-       $("#wrapperTestMe").jFormat("#multiPartial",model);
+       $("#wrapperTestMe").jFormat2("#multiPartial",model);
 </script>
-		
+
 </body>
 </html>

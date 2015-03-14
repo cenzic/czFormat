@@ -7,58 +7,59 @@
 <script src="../js/jFormat.js"></script>
 </head>
 <body>
-	<h1>javascript render template</h1>
+  <h1>javascript render template</h1>
 
-<script id="simpleJavascript" type="text/template">
+<template id="simpleJavascript" type="text/template">
 <h2>simple model</h2>
 <p>
-	<strong>'title': </strong>@model.title
+  <strong>'title': </strong>@model.title
 </p>
 <p>
-	<strong>name: </strong>@model.name
+  <strong>name: </strong>@model.name
 </p>
 <p>
-	<strong>age: </strong>@raw(model.age)
+  <strong>age: </strong>@raw(model.age)
 </p>
 <p>
-	<strong>not defined property: @model.notdefined</strong>
-</p>		
+  <strong>not defined property: @model.notdefined</strong>
+</p>
 
 <div id="stringWrapper"></div>
 
 <div id="remoteSimpleWrapper"></div>
-<@script>
-	$.jFormat.init({
-	    baseUrl: "http://localhost/github/jFormat/views"            
+<script>
+  $.jFormat.init({
+      baseUrl: "http://localhost/github/jFormat/views"
     });
-	$("#stringWrapper").jFormat("#stringTemplate","@model.title");
-	$("#remoteSimpleWrapper").jFormat("@simple",@@model);
-</@script>		
+  $("#stringWrapper").jFormat2("#stringTemplate",model.title);
+  $("#remoteSimpleWrapper").jFormat2("@simple",model);
+</script>
+
+</template>
+
+<div id="simpleJavascriptWrapper"></div>
+
+<template id="stringTemplate" type="text/template">
+  <h2>string model</h2>
+  <p>
+    <strong>@model</strong> is a string model
+  </p>
+  <p>
+    another use of string model <strong>@model</strong>
+  </p>
+</template>
+
+<script>
+  var model1 = {
+      "title": "test <title>",
+      "name": "test 'name'",
+      "age": "<i>unescapeme</i>",
+      "arr": "[1,2,3,4,5]"
+  }
+
+  $("#simpleJavascriptWrapper").jFormat2("#simpleJavascript",model1);
 
 </script>
 
-<div id="simpleJavascriptWrapper"></div>	
-<script id="stringTemplate" type="text/template">
-	<h2>string model</h2>
-	<p>
-		<strong>@model</strong> is a string model
-	</p>
-	<p>
-		another use of string model <strong>@model</strong>
-	</p>
-</script>
-
-<script>		        
-	var model1 = {
-	    "title": "test <title>",
-	    "name": "test 'name'",
-	    "age": "<i>unescapeme</i>",
-	    "arr": "[1,2,3,4,5]"
-	}
-    
-	$("#simpleJavascriptWrapper").jFormat("#simpleJavascript",model1);
-								
-</script>
-		
 </body>
 </html>

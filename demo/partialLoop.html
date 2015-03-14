@@ -31,32 +31,49 @@
   @partial("#testme",model)
 </div>
 <div>
-  @partial("@table",model.records)
+  <h2>Array model</h2>
+    <table>
+      <tr>
+        <th>Order</th>
+        <th>Name</th>
+        <th>Score</th>
+        <th>DOB</th>
+      </tr>
+      @foreach(var record in model.records){
+        <tr>
+          <td>@record.order</td>
+          <td>@record.name</td>
+          <td>@record.score</td>
+          <td>@record.dob</td>
+        <tr>
+      }
+  </table>
 </div>
 <div>
-  @partial("@simple",model)
+  @partial("#testme",model)
 </div>
 <div>
-  @partial("@partialTable",model.records)
-</div>
-<div>
-<h2>loop partial</h2>
-<table>
-  <tr>
-    <th>Order</th>
-    <th>Name</th>
-    <th>Score</th>
-    <th>DOB</th>
-  </tr>
-  @foreach(var record in model.records){
-    <tr>
-      @partial("@partialRow",record)
-    </tr>
-  }
-</table>
+  <h2>Array model</h2>
+    <table>
+      <tr>
+        <th>Order</th>
+        <th>Name</th>
+        <th>Score</th>
+        <th>DOB</th>
+      </tr>
+      @foreach(var record in model.records){
+        <tr>
+          <td>@record.order</td>
+          <td>@record.name</td>
+          <td>@record.score</td>
+          <td>@record.dob</td>
+        <tr>
+      }
+  </table>
 </div>
 </script>
 <div id="wrapperTestMe"></div>
+
 
 <script>
 var records = [];
@@ -75,9 +92,6 @@ for(var i=0;i<10;i++){
            "age": "<i>unescapeme</i>",
            "records": records
        }
-       $.jFormat.init({
-        baseUrl: "http://localhost/github/jFormat/views"
-    });
        $("#wrapperTestMe").jFormat2("#multiPartial",model);
 </script>
 

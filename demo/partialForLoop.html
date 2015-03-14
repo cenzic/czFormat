@@ -42,7 +42,7 @@
         </tr>
         @foreach(var student in model.students){
         <tr>
-            $.jFormat("#partialRow", @student)
+            @partial("#partialRow", student)
         <tr>
         }
     </table>
@@ -77,7 +77,7 @@
             "students":records,
             "note":"test complex model with array and simple property"
         }
-        $("#complexPartialWrapper").jFormat("#complexPartial", model2);
+        $("#complexPartialWrapper").jFormat2("#complexPartial", model2);
   </script>
 
 </body>

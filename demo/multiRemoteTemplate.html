@@ -1,0 +1,30 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>recursive calling render remote partial</title>
+<script src="../js/jquery-1.9.1.js"></script>
+<script src="../js/jFormat.js"></script>
+</head>
+<body>
+  <h1>recursive calling render remote partial</h1>
+  <div id="wrapperRecursiveRemote"></div>
+
+  <script type="text/javascript">
+    $.jFormat.init({
+        baseUrl: "http://localhost/github/jFormat/views"
+    });
+
+    //=============================== simple block ==============================
+
+    var model = {
+      "title": "test <title>",
+      "name": "test 'name'",
+      "age": "<i>unescapeme</i>"
+    }
+
+    $("#wrapperRecursiveRemote").jFormat2("@remote1", model);
+  </script>
+
+</body>
+</html>
