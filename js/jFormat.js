@@ -37,8 +37,11 @@
   }
 
   function replaceProperties(t, name){
-    var regex = new RegExp("@("+name+"((\\.[\\w.\\(\\)]+)*(\\[['\"]?.+?['\"]?\\])*(\\.[\\w.\\(\\)]+)*)+)[<\\s]","g");
-    t = t.replace(regex, function(m0,m1){return '" + helpers.htmlEscape(' + revert(m1) + ') + "';});
+    var regex = new RegExp("@("+name+"((\\.\\w+)*(\\[['\"]?.+?['\"]?\\])*(\\.\\w+)*)+)","g");
+    t = t.replace(regex, function(m0,m1){
+        console.log(arguments);
+        return '" + helpers.htmlEscape(' + revert(m0.substr(1)) + ') + "';
+      });
     return t;
   }
 
@@ -98,13 +101,16 @@
     var r = /@(for\(.+\)\{)\n/;
     var m = r.exec(t);
     if(!m) return t;
+    var startIndex = t.indexOf(m[0]);
+
     r = /@for\(var (.+) in ([^\)]*)\)\{\n/;
     var mKey = t.match(r);
     if(mKey){
       var key = mKey[1];
-      t = replaceProperties(t,key);
+      var body = getBody(t,startIndex);
+      var rBody = replaceProperties(body,key);
+      t = t.replace(body,rBody);
     }
-    var startIndex = t.indexOf(m[0]);
     var out = '" + (function(){' +
     'var tmp = "";' +  m[1] +
     'tmp += "';
@@ -113,6 +119,25 @@
     t = closeStatement(t, startIndex, true);
     return t;
   }
+
+  function getBody(t, startIndex){
+    var end = t.indexOf('}',startIndex);
+    var r = /@for\(.*\)\{|@foreach\(.*\)\{|@if\(.*\)\{|@else if\(.*\)\{|@else\{/g;
+    var m;
+    var last = startIndex;
+    while(m = r.exec(t)){
+      console.log(m[0]);
+      var next = t.indexOf(m[0], last);
+      if(next!=-1 && next < end){
+        last = end+1;
+        end = t.indexOf('}',last);
+      }else{
+        break;
+      }
+    }
+    return t.substring(startIndex, end);
+  }
+
   //t = t.replace(/\\/,'\\\\');
   //t = t.replace(/"/g,'\\"');
   function revert(t){
